@@ -38,23 +38,38 @@ int main(int argc, char** argv )
      {printf ("impossible de faire le bind\n");exit(0);}
 
   /* petit initialisation */
-  listen(sockfd,1);
-     
-  /* attend la connection d'un client */
-  clilen = sizeof (cli_addr);
-  newsockfd = accept (sockfd,(struct sockaddr*) &cli_addr, &clilen);
-  if (newsockfd<0) {printf ("accept error\n"); exit(0);}
-  printf ("connection accepted\n");
+  listen(sockfd,2);
 
-  
   while (1)
-   { while (read(newsockfd,&c,1)!=1);
-     printf("%c",c); 
-   }
-      
-   /*  attention il s'agit d'une boucle infinie 
-    *  le socket nn'est jamais ferme !
-    */
+  {
+    int scomm = accept(sockfd, (struct sockaddr*) &cli_addr, &clilen);
+    if (newsockfd<0) {printf ("accept error\n"); exit(0);}
+    printf ("connection accepted\n");
+    pid_t pid = fork();
+    if (pid == 0) /* c’est le fils */
+      {
+        close(sockfd); /* socket inutile pour le fils */
+        
+        /* traiter la communication */
+        printf ("child working\n");
+
+
+        c = 'f';
+        write(scomm,&c,1);
+        c = 'f';
+        write(scomm,&c,1);
+
+        close(scomm);
+        exit(0); /* on force la terminaison du fils */
+      }
+    else /* c’est le pere */
+      {
+        close(scomm); /* socket inutile pour le pere */
+        printf ("parent free\n");
+        
+      }
+  }
+  close(sockfd);
 
    return 1;
- }
+}

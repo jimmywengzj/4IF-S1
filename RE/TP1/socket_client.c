@@ -39,14 +39,15 @@ int main(int argc, char** argv )
   if (connect(sockfd,(struct sockaddr*)&serv_addr,sizeof(serv_addr))<0)
     {printf("socket error\n");exit(0);}
     
+  printf("connected\n");
+
+  while (1)
+  { while (read(sockfd,&c,1) != 1);
+    if(c == 'b') break;
+    printf("%c\n",c);
+  }
   
-  /* repete dans le socket tout ce qu'il entend */
-  while (1) {c=getchar();write (sockfd,&c,1);}
-  
-  
-  /*  attention il s'agit d'une boucle infinie 
-   *  le socket n'est jamais ferme !
-   */
+  close(sockfd);
    
    return 1;
 
